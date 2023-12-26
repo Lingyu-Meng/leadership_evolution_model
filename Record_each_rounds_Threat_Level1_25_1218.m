@@ -1,5 +1,5 @@
 % 2023/12/26 Lingyu
-% gene restructured, save all gene and investment
+% gene restructured, save all gene and investment, added tic toc
 % k = 5, 20, 200
 % Purpose: gain mean investment of leader and follower in each round in one
 % generation as function of k (rounds per generation).
@@ -35,7 +35,7 @@ beta   = 1;               % group strength exponent: S^beta
 N      = n*G;
 
 %% mutation parameter
-T          = 20000;       % generation
+T          = 200;       % generation
 mu         = 0.05;        % genetic mutation probability
 sigma_base = 0.01;        % st. dev. of genetic mutation effect
 sigma_lr   = 0.005;       % st. dev. of genetic mutation learning rate
@@ -84,9 +84,9 @@ GENE_POOL = zeros(T/skip, 2, n, G, 2, 2, 3, runs);
 % generation x leardership x subjects x group x effort/learning x k_level x runs
 
 for k_level=1:3
+    tic
     %%
     k = k_set(k_level);       % set k
-        
     %%
     parfor r = 1:runs % runs
         
@@ -242,15 +242,15 @@ for k_level=1:3
                 x_behavior=x_behavior(:,new_groups);
                 
                 % genes come from the mother or the father?
-                Rec=randi(2,n,2*n,G)-1; % 4 kinds genes,2n-subjects, group number)
+                Rec=randi(2,2,2*n,G)-1; % 2 kinds genes, subjects, group number)
                 
                 %%
                 for g=1:G
-                    female_genesx=genes(:,:,g,1,1);        % group female genes (n+2)xn
-                    male_genesx  =genes(:,:,g,1,2);        % group male genes (n+2)xn
+                    female_genesx=genes(:,:,g,1,1);        % group female genes 2 x n
+                    male_genesx  =genes(:,:,g,1,2);        % group male genes   2 x n
                     
-                    female_genesr=genes(:,:,g,2,1);        % group female genes (n+2)xn
-                    male_genesr  =genes(:,:,g,2,2);        % group male genes (n+2)xn
+                    female_genesr=genes(:,:,g,2,1);        % group female genes 2 x n
+                    male_genesr  =genes(:,:,g,2,2);        % group male genes   2 x n
                     
                     w=W_individual_average(:,g);
                     w1=W_individual_average1(:,g);
@@ -283,13 +283,13 @@ for k_level=1:3
                     genes(:,:,g,2,:)=reshape(Cr,2,n,1,1,2);
                 end
                 % random dispersal of females
-                females=reshape(genes(:,:,:,:,1),n,N,2);
+                females=reshape(genes(:,:,:,:,1),2,N,2);
                 females=females(:,randperm(N),:);
                 genes(:,:,:,:,1)=reshape(females,2,n,G,2,1);
                 
                 if random_dispersal_of_males
                     % random dispersal of males
-                    males=reshape(genes(:,:,:,:,2),n,N,2);
+                    males=reshape(genes(:,:,:,:,2),2,N,2);
                     males=males(:,randperm(N),:);
                     genes(:,:,:,:,2)=reshape(males,2,n,G,2,1);
                 end
@@ -303,7 +303,7 @@ for k_level=1:3
                 Gene_pool(t/skip, :, :, :, :, :) = genes;
                 effort=mean(mean(mean(mean(genes(:,:,:,1,:)))));
                 effort_leader=mean(reshape(genes(1,:,:,1,:),1,2*n*G));
-                effort_follower=mean(mean(reshape(genes(2:n,:,:,1,:),1,(n-1)*n*2*G)));
+                effort_follower=mean(mean(reshape(genes(2,:,:,1,:),1,n*2*G)));
                 
                 Beeffort=mean(mean(x_behavior));
                 Beeffort_leader=mean(x_behavior(1,:));
@@ -317,7 +317,7 @@ for k_level=1:3
                 Effort_F(:,t/skip)=effort_follower;
                 
                 LR_L(:,t/skip)= mean(reshape(genes(1,:,:,2,:),1,2*n*G));
-                LR_F(:,t/skip)= mean(reshape(genes(2:n,:,:,2,:),1,2*n*(n-1)*G));
+                LR_F(:,t/skip)= mean(reshape(genes(2,:,:,2,:),1,2*n*G));
                 
                 Wr1=reshape(W_individual_average1,n,G);              % reshaped W
                 Wmean1(:,t/skip)=mean(Wr1,2);                               % mean of relative fitnesses
@@ -346,23 +346,23 @@ for k_level=1:3
             c=randn;
             if c>0
                 % effort
-                gene_efforts=reshape(genes(:,:,:,1,:),1,G*n*n*2);
-                mutants_be=find(rand(n*n*G*2,1)<mu);
+                gene_efforts=reshape(genes(:,:,:,1,:),1,G*n*2*2);
+                mutants_be=find(rand(2*n*G*2,1)<mu);
                 gene_efforts(mutants_be)=gene_efforts(mutants_be)+sigma_base*randn(length(mutants_be),1)';
-                genes(:,:,:,1,:)=reshape(gene_efforts,n,n,G,1,2);
+                genes(:,:,:,1,:)=reshape(gene_efforts,2,n,G,1,2);
             else
                 % learning rate
-                gene_lr=reshape(genes(:,:,:,2,:),1,G*n*n*2);
-                mutants_lr=find(rand(n*n*G*2,1)<mu);
+                gene_lr=reshape(genes(:,:,:,2,:),1,G*n*2*2);
+                mutants_lr=find(rand(2*n*G*2,1)<mu);
                 gene_lr(mutants_lr)=gene_lr(mutants_lr)+sigma_lr*randn(length(mutants_lr),1)';
-                genes(:,:,:,2,:)=reshape(gene_lr,n,n,G,1,2);
+                genes(:,:,:,2,:)=reshape(gene_lr,2,n,G,1,2);
             end
             
             %% prevent negative
             % Basic effect
-            genes_effort=reshape(genes(:,:,:,1,:),n,n,G,2);
+            genes_effort=reshape(genes(:,:,:,1,:),2,n,G,2);
             genes_effort(genes_effort<0)=0.001;
-            genes(:,:,:,1,:)=reshape(genes_effort,n,n,G,2);
+            genes(:,:,:,1,:)=reshape(genes_effort,2,n,G,2);
             % learning rate
             genes_lr=genes(:,:,:,2,:);
             if gene_lr_positive
@@ -389,9 +389,11 @@ for k_level=1:3
         WMEAN_L1(:, k_level, r) = Wmean_L1;
         SMEAN(:, k_level, r)    = Smean;
         
-        INVEST(:, :, :, k_level, r) = Invest;
+        INVEST(:, :, :, :, k_level, r) = Invest;
         GENE_POOL(:, :, :, :, :, :, k_level, r) = Gene_pool;
     end
+    fprintf('This k_level used\n');
+    toc
 end    
 %%
 path=pwd;
