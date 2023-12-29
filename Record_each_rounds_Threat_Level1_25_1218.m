@@ -9,9 +9,11 @@
 %
 % parfor restructured 
 % Inmportant Output:
-% INVMEN_L  % T/skip x 200 x runs(5) each mean investment of leader
-% INVMEN_F  % T/skip x 200 x runs(5) each mean investment of follower
+% INVEST  % T/skip x n x G x 200 x klevel x runs(5)
 % when k < 200, remainder will be zero
+
+% GENE_POOL 
+% T/skip, leardership(2), n, G, effort/learning(2), sex(2), k_level(3), runs(5)
 
 % changed form FAF_HJ_0122.m
 
@@ -81,7 +83,7 @@ SMEAN    = zeros(T/skip, 3, runs);
 INVEST = zeros(T/skip, n, G, 200, 3, runs); % use same scale, each k level record 200 rounds
 % generation x subjects x group x round x k_level x runs
 GENE_POOL = zeros(T/skip, 2, n, G, 2, 2, 3, runs); 
-% generation x leardership x subjects x group x effort/learning x k_level x runs
+% generation x leardership x subjects x group x effort/learning x gender x k_level x runs
 
 for k_level=1:3
     tic
