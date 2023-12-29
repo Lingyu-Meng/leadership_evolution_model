@@ -2,6 +2,7 @@
 % for 10 gene
 % There should only one file in result
 % if 1,3 plot dotted line too hard to distinguish, change distinguish
+% legend update
 
 clc
 clear
@@ -34,17 +35,17 @@ lowc=[0.7 0.7 0.7];
 %%
 subplot(2,3,1)
 
-plot(x,XL(:,1),'Color',k5,'LineWidth',4,'LineStyle','-')
+l1 = plot(x,XL(:,1),'Color',k5,'LineWidth',4,'LineStyle','-','DisplayName','Leader in k=5');
 hold on
-plot(x,XF(:,1),'Color',k5,'LineWidth',4,'LineStyle',':')
+l2 = plot(x,XF(:,1),'Color',k5,'LineWidth',4,'LineStyle',':','DisplayName','Follower in k=5');
 hold on
-plot(x,XL(:,2),'Color',k20,'LineWidth',4,'LineStyle','-')
+l3 = plot(x,XL(:,2),'Color',k20,'LineWidth',4,'LineStyle','-','DisplayName','Leader in k=20');
 hold on
-plot(x,XF(:,2),'Color',k20,'LineWidth',4,'LineStyle',':')
+l4 = plot(x,XF(:,2),'Color',k20,'LineWidth',4,'LineStyle',':','DisplayName','Follower in k=20');
 hold on
-plot(x,XL(:,3),'Color',k200,'LineWidth',4,'LineStyle','-')
+l5 = plot(x,XL(:,3),'Color',k200,'LineWidth',4,'LineStyle','-','DisplayName','Leader in k=200');
 hold on
-plot(x,XF(:,3),'Color',k200,'LineWidth',4,'LineStyle',':')
+l6 = plot(x,XF(:,3),'Color',k200,'LineWidth',4,'LineStyle',':','DisplayName','Follower in k=200');
 hold on
 
 xlabel('Time','FontSize',24,'FontWeight','bold')
@@ -103,7 +104,6 @@ subplot(2,3,4)
 
 plot(1:5,mean(INVMEN_L(end,1:5,1,:),4),'LineWidth',2,'Color',k5,'LineStyle','-')
 hold on
-%scatter(reshape(repmat([1:5]',1,5),1,:),reshape(squeeze(INVMEN_L(end,1:5,1,:)),1,:))
 plot(1:5,mean(INVMEN_F(end,1:5,1,:),4),'LineWidth',2,'Color',k5,'LineStyle',':')
 hold on
 ylabel('Investment','FontSize',16)
@@ -122,8 +122,6 @@ xlabel('Round','FontSize',16)
 set(gca,'FontSize',16)
 hold off
 
-
-
 subplot(2,3,6)
 plot(1:200, mean(INVMEN_L(end,1:200,3,:),4), 'LineWidth', 2,'Color',k200,'LineStyle','-')
 hold on
@@ -139,3 +137,7 @@ set(gcf,'Position',[0 0 1500 1500]);
 set(findobj('FontSize',10),'FontSize',figure_FontSize);
 set(findobj(get(gca,'Children'),'LineWidth',0.5),'LineWidth',1);
 set(gcf,'color','w')
+
+lgd = legend([l1,l2,l3,l4,l5,l6]);
+lgd.Position = [-0.44,0.03,1,0.3];
+lgd.Box = 'off';
