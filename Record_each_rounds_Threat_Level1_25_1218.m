@@ -1,4 +1,6 @@
-% 2023/12/26 Lingyu
+% 2025/02/22 Lingyu
+% removed P from the within group selection (W). As we supose it can help for
+% stable results.
 % gene restructured, save all gene and investment, added tic toc
 % k = 5, 20, 200
 % Purpose: gain mean investment of leader and follower in each round in one
@@ -37,7 +39,7 @@ beta   = 1;               % group strength exponent: S^beta
 N      = n*G;
 
 %% mutation parameter
-T          = 200;       % generation
+T          = 40000;       % generation
 mu         = 0.05;        % genetic mutation probability
 sigma_base = 0.01;        % st. dev. of genetic mutation effect
 sigma_lr   = 0.005;       % st. dev. of genetic mutation learning rate
@@ -90,7 +92,7 @@ for k_level=1:3
     %%
     k = k_set(k_level);       % set k
     %%
-    parfor r = 1:runs % runs
+    parfor (r = 1:runs, 8) % runs, number of cores
         
         rr = 1.25;              % mean of attacker effect. Actually defined the threat level at here!
         a_sig=sig*rr;               % standard deviation of attacker effect
@@ -186,9 +188,9 @@ for k_level=1:3
                 Cost=reshape(cost,N,1);
                 
                 if IADC
-                    W(:,round)=w_base+P.*(b*V-Cost.*X.^alpha);     % NEED TO RECOMPUTE WITH TAX!!!!s
+                    W(:,round)=w_base+(b*V-Cost.*X.^alpha);     % NEED TO RECOMPUTE WITH TAX!!!!s
                 else
-                    W(:,round)=w_base+b.*V.*P-Cost.*X.^alpha;     % NEED TO RECOMPUTE WITH TAX!!!!
+                    W(:,round)=w_base+b.*V - Cost.*X.^alpha;     % NEED TO RECOMPUTE WITH TAX!!!!
                 end
                 p_round(:,round)=p;
                 %% update
