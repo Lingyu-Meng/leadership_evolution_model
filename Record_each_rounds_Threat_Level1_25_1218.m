@@ -1,4 +1,6 @@
 % 2023/12/26 Lingyu
+% removed P from the within group selection (W). As we supose it can help for
+% stable results.
 % gene restructured, save all gene and investment
 % k = 5, 20, 200
 % Purpose: gain mean investment of leader and follower in each round in one
@@ -35,7 +37,7 @@ beta   = 1;               % group strength exponent: S^beta
 N      = n*G;
 
 %% mutation parameter
-T          = 20000;       % generation
+T          = 40000;       % generation
 mu         = 0.05;        % genetic mutation probability
 sigma_base = 0.01;        % st. dev. of genetic mutation effect
 sigma_lr   = 0.005;       % st. dev. of genetic mutation learning rate
@@ -80,7 +82,7 @@ SMEAN    = zeros(T/skip, 3, runs);
 
 INVEST = zeros(T/skip, n, G, 200, 3, runs); % use same scale, each k level record 200 rounds
 % generation x subjects x group x round x k_level x runs
-GENE_POOL = zeros(T/skip, 2, n, G, 2, 2, 3, runs); 
+GENE_POOL = zeros(T/skip, n, n, G, 2, 2, 3, runs); 
 % generation x leardership x subjects x group x effort/learning x k_level x runs
 
 for k_level=1:3
@@ -93,7 +95,7 @@ for k_level=1:3
         rr = 1.25;              % mean of attacker effect. Actually defined the threat level at here!
         a_sig=sig*rr;               % standard deviation of attacker effect
         
-        Gene_pool = zeros(T/skip, 2, n, G, 2, 2); % all alived gene in selected generations
+        Gene_pool = zeros(T/skip, n, n, G, 2, 2); % all alived gene in selected generations
         Invest    = zeros(T/skip, n, G, 200);
         
         BEEffort=zeros(1,T/skip);
@@ -117,7 +119,7 @@ for k_level=1:3
         Wmean_F1=zeros(1,T/skip);
         
         % initial conditions
-        genes = rand(2,n,G,2,2);                        % define the size,(genes,subject,group number,contribution or learning rate,sex)
+        genes = rand(n,n,G,2,2);                        % define the size,(genes,subject,group number,contribution or learning rate,sex)
         genes(:,:,:,1,:) = 2*rr*genes(:,:,:,1,:);       % basic contribution   U(0,2*rr)
         if gene_lr_positive
             genes(:,:,:,2,:) = learning_coeffcient.*genes(:,:,:,2,:);
@@ -140,8 +142,8 @@ for k_level=1:3
                     leader_lr = reshape(genes(1,1,:,2,2),1,G);
                     x(1,:) = genes(1,i,:,1,2);    % Basic effort of male leader
                 else
-                    follower_lr(i-1,:) = reshape(genes(2,i,:,2,2),1,G);
-                    x(i,:) = genes(2,i,:,1,2);    % Basic effort of male follower
+                    follower_lr(i-1,:) = reshape(genes(i,i,:,2,2),1,G);
+                    x(i,:) = genes(i,i,:,1,2);    % Basic effort of male follower
                 end  
             end
             x_behavior = x;                       % n x G
@@ -184,9 +186,9 @@ for k_level=1:3
                 Cost=reshape(cost,N,1);
                 
                 if IADC
-                    W(:,round)=w_base+P.*(b*V-Cost.*X.^alpha);     % NEED TO RECOMPUTE WITH TAX!!!!s
+                    W(:,round)=w_base+(b*V-Cost.*X.^alpha);     % NEED TO RECOMPUTE WITH TAX!!!!s
                 else
-                    W(:,round)=w_base+b.*V.*P-Cost.*X.^alpha;     % NEED TO RECOMPUTE WITH TAX!!!!
+                    W(:,round)=w_base+b.*V-Cost.*X.^alpha;     % NEED TO RECOMPUTE WITH TAX!!!!
                 end
                 p_round(:,round)=p;
                 %% update
@@ -246,11 +248,11 @@ for k_level=1:3
                 
                 %%
                 for g=1:G
-                    female_genesx=genes(:,:,g,1,1);        % group female genes (n+2)xn
-                    male_genesx  =genes(:,:,g,1,2);        % group male genes (n+2)xn
+                    female_genesx=genes(:,:,g,1,1);        % group female genes n x n
+                    male_genesx  =genes(:,:,g,1,2);        % group male genes n x n
                     
-                    female_genesr=genes(:,:,g,2,1);        % group female genes (n+2)xn
-                    male_genesr  =genes(:,:,g,2,2);        % group male genes (n+2)xn
+                    female_genesr=genes(:,:,g,2,1);        % group female genes n x n
+                    male_genesr  =genes(:,:,g,2,2);        % group male genes  n x n
                     
                     w=W_individual_average(:,g);
                     w1=W_individual_average1(:,g);
@@ -279,19 +281,19 @@ for k_level=1:3
                     % assign sexes and leader randomly
                     Cx=Cx(:,randperm(2*n));
                     Cr=Cr(:,randperm(2*n));
-                    genes(:,:,g,1,:)=reshape(Cx,2,n,1,1,2);            % redefine genes
-                    genes(:,:,g,2,:)=reshape(Cr,2,n,1,1,2);
+                    genes(:,:,g,1,:)=reshape(Cx,n,n,1,1,2);            % redefine genes
+                    genes(:,:,g,2,:)=reshape(Cr,n,n,1,1,2);
                 end
                 % random dispersal of females
                 females=reshape(genes(:,:,:,:,1),n,N,2);
                 females=females(:,randperm(N),:);
-                genes(:,:,:,:,1)=reshape(females,2,n,G,2,1);
+                genes(:,:,:,:,1)=reshape(females,n,n,G,2,1);
                 
                 if random_dispersal_of_males
                     % random dispersal of males
                     males=reshape(genes(:,:,:,:,2),n,N,2);
                     males=males(:,randperm(N),:);
-                    genes(:,:,:,:,2)=reshape(males,2,n,G,2,1);
+                    genes(:,:,:,:,2)=reshape(males,n,n,G,2,1);
                 end
             end
             
@@ -389,7 +391,7 @@ for k_level=1:3
         WMEAN_L1(:, k_level, r) = Wmean_L1;
         SMEAN(:, k_level, r)    = Smean;
         
-        INVEST(:, :, :, k_level, r) = Invest;
+        INVEST(:, :, :, :, k_level, r) = Invest;
         GENE_POOL(:, :, :, :, :, :, k_level, r) = Gene_pool;
     end
 end    
