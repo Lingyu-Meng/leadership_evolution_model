@@ -432,7 +432,7 @@ for runs = 1:runs_number
 
         save genes_tl_MaxLimi genes_tl seed
 
-        clearvars -except runs ti ti_num time_S_ti;
+        clearvars -except runs ti ti_num time_S_ti path;
 
         time_E_ti=clock;
         run_time2=etime(time_E_ti,time_S_ti);
