@@ -1,8 +1,11 @@
+% 2025/05/10 Lingyu
+% go back to double P
+%
 % 2025/02/28 Lingyu
 % merge FAF_R200_Cost1_th1_lv1.m (2022/10/24) for segmented data storage
 % moved parameters setting to the loop of ti_num
 % removed P from the within group selection (W). As we supose it can help for
-% stable results.
+% stable results. (changed)
 % gene restructured, save all gene
 % k = 200
 %
@@ -207,9 +210,9 @@ for runs = 1:runs_number
                         Cost = reshape(cost,N,1);
 
                         if IADC
-                            W(:,round) = w_base + (b * V - Cost .* X .^ alpha);
+                            W(:,round) = w_base + (b * V .* P - Cost .* X .^ alpha);
                         else
-                            W(:,round) = w_base + b .* V - Cost .* X .^ alpha;
+                            W(:,round) = w_base + b .* V .* P - Cost .* X .^ alpha;
                         end
                         p_round(:,round) = p;
                         %% update
