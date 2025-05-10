@@ -426,7 +426,7 @@ for runs = 1:runs_number
             mat_file=strrep(name,'.','_');
             cd([path,'/R_MaxLimi/'])
             savepath=[mat_file,'.mat'];
-            eval(['save ', savepath,' T_all T_dur ti_num ti T_range  TLlist a_mu n G T b w_base c0 leader_value skip SMEAN XMEAN_L WMEAN_L1 WMEAN_L LRMEAN_L  BEMEAN_L BEMEAN_F XMEAN_F WMEAN_F1 WMEAN_F LRMEAN_F GROUP_P'])
+            eval(['save ', savepath,' T_all T_dur ti_num ti T_range  TLlist a_mu n G T b w_base c0 leader_value skip SMEAN XMEAN_L WMEAN_L1 WMEAN_L LRMEAN_L  BEMEAN_L BEMEAN_F XMEAN_F WMEAN_F1 WMEAN_F LRMEAN_F GROUP_P genes_tl'])
             cd(path)
         end
 
