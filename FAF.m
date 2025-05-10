@@ -14,8 +14,6 @@
 % which was the runs, has been changed to the level of threat. Those change are
 % followed by FAF_R200_Cost1_th1_lv1.m
 %
-% Purpose: gain mean investment of leader and follower in each round in one
-% generation as function of k (rounds per generation).
 % Model Setting:
 % One threat level (rr = 1.25)
 % Fight with nonevolutionary rival (controled by threat level)
@@ -51,12 +49,11 @@ for runs = 1:runs_number
         w_base = 0;              % basal fitness
 
         %% Threat related Parameters
-        a_mu   = 1;               % number of threat level %cannot change in this script
         c0     = 0.1;               % initial cost
         cost_e = 0.03;            % cost_coefficient
         alpha  = 1;               % cost exponent -cx^alpha or -c(exp(x^alpha)-1)
         beta   = 1;               % group strength exponent: S^beta
-        TLlist = [0.01, 0.05, 0.1, 0.5, 1, 5];
+        TLlist = [1.25];
         a_mu   = length(TLlist);  % number of threat level
         N      = n*G;
 
