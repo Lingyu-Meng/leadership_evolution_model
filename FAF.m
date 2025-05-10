@@ -15,7 +15,7 @@
 % followed by FAF_R200_Cost1_th1_lv1.m
 %
 % Model Setting:
-% One threat level (rr = 1.25)
+% 5 threat level (rr = 0.75 1 1.25 1.5 2)
 % Fight with nonevolutionary rival (controled by threat level)
 %
 % using f0=0，b=4，c=0.1，X0=0.1 as Prof Xu suggested
@@ -53,7 +53,7 @@ for runs = 1:runs_number
         cost_e = 0.03;            % cost_coefficient
         alpha  = 1;               % cost exponent -cx^alpha or -c(exp(x^alpha)-1)
         beta   = 1;               % group strength exponent: S^beta
-        TLlist = [1.25];
+        TLlist = [0.75 1 1.25 1.5 2];
         a_mu   = length(TLlist);  % number of threat level
         N      = n*G;
 
